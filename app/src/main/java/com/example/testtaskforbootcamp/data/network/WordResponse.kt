@@ -1,12 +1,14 @@
 package com.example.testtaskforbootcamp.data.network
 
 
+import com.example.testtaskforbootcamp.domain.WordItem
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 class WordResponse : ArrayList<WordResponse.WordResponseItem>(){
     @JsonClass(generateAdapter = true)
     data class WordResponseItem(
+        val itemId:Int=WordItem.UNDEFINED_ID,
         @Json(name = "meanings")
         val meanings: List<Meaning>,
         @Json(name = "phonetics")

@@ -16,16 +16,16 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.testtaskforbootcamp.R
 import com.example.testtaskforbootcamp.databinding.MainFragmentBinding
-import java.lang.Exception
 
 class MainFragment : Fragment() {
 
     private val viewBinding: MainFragmentBinding by viewBinding()
-    private lateinit var viewModel: MainViewModel
+
+     lateinit var viewModel: MainViewModel
+
 
     private lateinit var word:TextView
     private lateinit var phonetics:TextView
@@ -47,11 +47,22 @@ class MainFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         addTextChangeListeners()
         observeViewModel()
-       observeWordResponse()
         setButtonListener()
+       observeWordResponse()
+observDB()
+
     }
 
-val word1="word"
+@SuppressLint("SetTextI18n")
+private fun observDB(){
+
+    viewModel.wordDBLiveData.observe(viewLifecycleOwner,{
+        word.text= " from database ${it.word}"
+        phonetics.text=it.phonetic
+        meanings.text=it.meanings
+        Log.d("addWordItem","${it.phonetic}")
+    })
+}
 
     @SuppressLint("SetTextI18n")
     private fun observeWordResponse() {
@@ -83,12 +94,9 @@ val word1="word"
     }
     private fun setButtonListener() {
         generateButton.setOnClickListener {
-//            if(enterWord.text!=null && enterWord.text.toString() !="") {
          wordEnter=enterWord.text.toString()
             viewModel.fetchWord(wordEnter)
-//        }else{
-//                viewModel.fetchWord("empty")
-//            }
+
         }
     }
     private fun initViewBinding(){
