@@ -14,21 +14,24 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginBottom="4dp">
+            android:layout_marginBottom="4dp"
+            android:background="@color/purple_200">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_word"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="enter word"
-                android:inputType="textCapWords" />
+                android:inputType="textCapWords"
+                android:background="@color/purple_200"/>
         </com.google.android.material.textfield.TextInputLayout>
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/generate_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Generate"
         android:layout_marginTop="16dp"
+        android:background="@color/purple_200"
          />
 
         <TextView
@@ -49,6 +52,11 @@
             android:layout_marginBottom="4dp"
             android:text="Hello" />
 
+
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
         <TextView
             android:id="@+id/meanings"
             android:layout_width="match_parent"
@@ -58,50 +66,16 @@
             android:layout_marginBottom="4dp"
             android:text="Hello" />
 
-        <TextView
-            android:id="@+id/partOfSpeech"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="4dp"
-            android:text="Hello" />
 
-        <TextView
-android:id="@+id/example"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="4dp"
-            android:text="Hello" />
+    </ScrollView>
 
-        <TextView
-            android:id="@+id/definitions"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="4dp"
-            android:text="Hello" />
 
-        <TextView
-            android:id="@+id/synonyms"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="4dp"
-            android:text="Hello" />
 
-        <TextView
-           android:background="@color/cardview_shadow_end_color"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="4dp"
-            android:text="Hello" />
+
+
+
+
+
 
 
     </androidx.appcompat.widget.LinearLayoutCompat>

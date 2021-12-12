@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Test Task For Boot Camp</string>
+    <string name="error_input_name">error input name</string>
 </resources>
