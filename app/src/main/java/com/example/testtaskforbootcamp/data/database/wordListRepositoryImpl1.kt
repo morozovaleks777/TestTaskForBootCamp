@@ -6,8 +6,9 @@ import androidx.lifecycle.Transformations
 import com.example.testtaskforbootcamp.data.WordListMapper
 import com.example.testtaskforbootcamp.domain.WordItem
 import com.example.testtaskforbootcamp.domain.WordListRepository
+import javax.inject.Inject
 
-class WordListRepositoryImpl1(application: Application) : WordListRepository {
+class WordListRepositoryImpl1 @Inject constructor(application: Application) : WordListRepository {
 
     private val wordListDao = AppDatabase.getInstance(application).wordListDao()
     private val mapper = WordListMapper()

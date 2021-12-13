@@ -1,6 +1,7 @@
 package com.example.testtaskforbootcamp.presentation
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.text.Editable
@@ -17,14 +18,26 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.example.testtaskforbootcamp.App
 import com.example.testtaskforbootcamp.R
 import com.example.testtaskforbootcamp.databinding.MainFragmentBinding
+import dagger.Binds
+import javax.inject.Inject
 
-class MainFragment : Fragment() {
+class MainFragment  : Fragment()  {
+
+
 
     private val viewBinding: MainFragmentBinding by viewBinding()
 
-     lateinit var viewModel: MainViewModel
+
+  @Inject
+   lateinit var viewModelFactory:ViewModelFactory
+
+    private val viewModel by lazy {
+        ViewModelProvider(this,viewModelFactory)[MainViewModel::class.java]
+    }
+
 
 
     private lateinit var word:TextView
@@ -34,6 +47,9 @@ class MainFragment : Fragment() {
     private lateinit var generateButton:Button
     private lateinit var wordEnter:String
 
+
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -42,9 +58,12 @@ class MainFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
         super.onViewCreated(view, savedInstanceState)
+
         initViewBinding()
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+       // viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+
         addTextChangeListeners()
         observeViewModel()
         setButtonListener()

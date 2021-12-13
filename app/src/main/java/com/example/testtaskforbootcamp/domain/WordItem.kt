@@ -1,6 +1,8 @@
 package com.example.testtaskforbootcamp.domain
 
- data class WordItem (
+import javax.inject.Inject
+
+data class WordItem @Inject constructor (
      var itemId: Int = UNDEFINED_ID,
      val meanings: String,
      val phonetic: String,

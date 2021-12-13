@@ -5,8 +5,9 @@ package com.example.testtaskforbootcamp.data
 import com.example.testtaskforbootcamp.data.database.DBItem
 import com.example.testtaskforbootcamp.data.network.WordResponse
 import com.example.testtaskforbootcamp.domain.WordItem
+import javax.inject.Inject
 
-class WordListMapper {
+class WordListMapper @Inject constructor() {
 
     fun mapWordResponseToWordItem1(wordItemDBModel: WordResponse.WordResponseItem): WordItem {
         return WordItem(

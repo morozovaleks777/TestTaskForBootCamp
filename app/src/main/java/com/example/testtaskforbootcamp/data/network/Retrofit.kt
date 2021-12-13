@@ -2,8 +2,9 @@ package com.example.testtaskforbootcamp.data.network
 
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import javax.inject.Inject
 
-class Retrofit {
+class Retrofit @Inject constructor() {
 
     val wordApi = Retrofit.Builder()
         .addConverterFactory(MoshiConverterFactory.create())

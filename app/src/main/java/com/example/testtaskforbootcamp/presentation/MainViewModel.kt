@@ -1,9 +1,11 @@
 package com.example.testtaskforbootcamp.presentation
 
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.testtaskforbootcamp.data.WordListMapper
 import com.example.testtaskforbootcamp.data.database.WordListRepositoryImpl1
 import com.example.testtaskforbootcamp.data.network.Retrofit
@@ -16,17 +18,28 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.util.*
+import javax.inject.Inject
 
-class MainViewModel  (application: Application):AndroidViewModel(application) {
-    private val wordRepository = Retrofit()
-    private val repository= WordListRepositoryImpl1(application)
-    private val  addWordItemUseCase=AddWordItemUseCase(repository)
-    private val  getWordItemUseCase=GetWordItemUseCase(repository)
-    private val  getWordListCase= GetWordListUseCase(repository)
-    private val  mapper=WordListMapper()
-    private var wordItemId: Int = WordItem.UNDEFINED_ID
+//class MainViewModel @Inject constructor (application: Application):AndroidViewModel(application) {
+class MainViewModel @Inject constructor (
+             private val wordRepository : Retrofit,
+            private val  addWordItemUseCase:AddWordItemUseCase,
+            private val  getWordItemUseCase:GetWordItemUseCase,
+             getWordListCase:GetWordListUseCase,
+            private val  mapper:WordListMapper,
 
-    val wordLiveData=MutableLiveData<WordResponse.WordResponseItem>()
+
+        ):ViewModel() {
+//    private val wordRepository = Retrofit()
+//   // private val repository= WordListRepositoryImpl1(application)
+//    private val  addWordItemUseCase=AddWordItemUseCase(repository)
+//    private val  getWordItemUseCase=GetWordItemUseCase(repository)
+//    private val  getWordListCase= GetWordListUseCase(repository)
+//    private val  mapper=WordListMapper()
+//    private var wordItemId: Int = WordItem.UNDEFINED_ID
+
+    val wordLiveData =MutableLiveData<WordResponse.WordResponseItem>()
+
     val wordDBLiveData=MutableLiveData<WordItem>()
 
 
