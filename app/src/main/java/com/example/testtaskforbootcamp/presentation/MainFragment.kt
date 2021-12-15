@@ -1,7 +1,6 @@
 package com.example.testtaskforbootcamp.presentation
 
 import android.annotation.SuppressLint
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.text.Editable
 import android.text.SpannableString
@@ -9,30 +8,33 @@ import android.text.Spanned
 import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.testtaskforbootcamp.R
 import com.example.testtaskforbootcamp.databinding.MainFragmentBinding
+import com.example.testtaskforbootcamp.domain.WordItem
 
 class MainFragment : Fragment() {
 
     private val viewBinding: MainFragmentBinding by viewBinding()
 
-     lateinit var viewModel: MainViewModel
-
-
-    private lateinit var word:TextView
-    private lateinit var phonetics:TextView
-    private lateinit var meanings:TextView
-    private lateinit var enterWord:EditText
-    private lateinit var generateButton:Button
-    private lateinit var wordEnter:String
+    val viewModel by lazy {
+        ViewModelProvider(this).get(MainViewModel::class.java)
+    }
+    private lateinit var word: TextView
+    private lateinit var phonetics: TextView
+    private lateinit var meanings: TextView
+    private lateinit var enterWord: EditText
+    private lateinit var generateButton: Button
+    private lateinit var wordEnter: String
+    private lateinit var itemList: List<WordItem>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,67 +46,96 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViewBinding()
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         addTextChangeListeners()
         observeViewModel()
         setButtonListener()
-       observeWordResponse()
-observDB()
+        observeWordResponse()
+        observDB()
 
+        viewModel.wordList.observe(viewLifecycleOwner) {
+            Log.d("addWordItem", " base from fragment ${it.size}")
+
+        }
     }
 
-@SuppressLint("SetTextI18n")
-private fun observDB(){
+    @SuppressLint("SetTextI18n")
+    private fun observDB() {
 
-    viewModel.wordDBLiveData.observe(viewLifecycleOwner,{
-        word.text= " from database ${it.word}"
-        phonetics.text=it.phonetic
-        meanings.text=it.meanings
-        Log.d("addWordItem","${it.phonetic}")
-    })
-}
+        viewModel.wordDBLiveData.observe(viewLifecycleOwner, {
+            word.text = "from database: \n word :  \n ${it.word}"
+            phonetics.text = "phonetic :    \n ${it.phonetic}"
+            meanings.text = "meanings :  \n ${it.meanings}"
+        })
+    }
 
     @SuppressLint("SetTextI18n")
     private fun observeWordResponse() {
 
-        viewModel.wordLiveData.observe(viewLifecycleOwner) {response ->apply {
-            val wordMeanings=SpannableString(     "definition :  \n ${response.meanings.indices.map { response.meanings }} \n" +
-                    "example : \n ${response.meanings[0].definitions[0].example} \n" +
-                    "synonyms : \n ${response.meanings[0].definitions[0].synonyms}")
-            wordMeanings.setSpan( ForegroundColorSpan(resources.getColor(R.color.purple_200)), 0, 10, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        viewModel.wordLiveData.observe(viewLifecycleOwner) { response ->
+            apply {
+                val wordMeanings = SpannableString(
+                    "definition :  \n ${response.meanings.indices.map { response.meanings }} \n" +
+                            "example : \n ${response.meanings[0].definitions[0].example} \n" +
+                            "synonyms : \n ${response.meanings[0].definitions[0].synonyms}"
+                )
+                wordMeanings.setSpan(
+                    ForegroundColorSpan(
+                        resources.getColor(
+                            R.color.purple_200,
+                            resources.newTheme()
+                        )
+                    ),
+                    0,
+                    10,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
 
-            val wordText= SpannableString("word :  \n ${response.word}")
-            wordText.setSpan( ForegroundColorSpan(resources.getColor(R.color.purple_200)), 0, 5, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                val wordText = SpannableString("word :  \n ${response.word}")
+                wordText.setSpan(
+                    ForegroundColorSpan(
+                        resources.getColor(
+                            R.color.purple_200,
+                            resources.newTheme()
+                        )
+                    ), 0, 5, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
 
-            val wordPhonetic= SpannableString("phonetics :  \n ${response.phonetics[0].text}")
-            wordPhonetic.setSpan( ForegroundColorSpan(resources.getColor(R.color.purple_200)), 0, 9, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                val wordPhonetic = SpannableString("phonetics :  \n ${response.phonetics[0].text}")
+                wordPhonetic.setSpan(
+                    ForegroundColorSpan(
+                        resources.getColor(
+                            R.color.purple_200,
+                            resources.newTheme()
+                        )
+                    ), 0, 9, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
 
-            word.text= wordText
-            phonetics.text=wordPhonetic
-            meanings.text=wordMeanings
+                word.text = wordText
+                phonetics.text = wordPhonetic
+                meanings.text = wordMeanings
 
 
-
-
-
-
-
-        }
+            }
         }
     }
+
     private fun setButtonListener() {
         generateButton.setOnClickListener {
-         wordEnter=enterWord.text.toString()
-            viewModel.fetchWord(wordEnter)
+            wordEnter = enterWord.text.toString()
 
+            viewModel.wordList.observe(viewLifecycleOwner, {
+                itemList = it.filter { wordItem: WordItem -> wordItem.word == wordEnter }
+            })
+            viewModel.fetchWord(wordEnter)
         }
     }
-    private fun initViewBinding(){
-         generateButton =viewBinding.generateButton
-         word=viewBinding.word
-         phonetics=viewBinding.phonetics
-         meanings=viewBinding.meanings
-         enterWord=viewBinding.etWord
+
+    private fun initViewBinding() {
+        generateButton = viewBinding.generateButton
+        word = viewBinding.word
+        phonetics = viewBinding.phonetics
+        meanings = viewBinding.meanings
+        enterWord = viewBinding.etWord
 
     }
 
@@ -116,7 +147,7 @@ private fun observDB(){
             } else {
                 null
             }
-            enterWord.error=message
+            enterWord.error = message
 
         }
         viewModel.closeScreen.observe(viewLifecycleOwner) {
@@ -140,6 +171,7 @@ private fun observDB(){
 
     companion object {
         fun newInstance() = MainFragment()
+
     }
 
 }

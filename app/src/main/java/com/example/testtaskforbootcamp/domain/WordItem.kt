@@ -1,7 +1,7 @@
 package com.example.testtaskforbootcamp.domain
 
  data class WordItem (
-     var itemId: Int = UNDEFINED_ID,
+    var itemId: Int = UNDEFINED_ID,
      val meanings: String,
      val phonetic: String,
      val word: String,
@@ -10,6 +10,7 @@ package com.example.testtaskforbootcamp.domain
     {
         companion object {
         const val UNDEFINED_ID = 0
+            var idCounter=0
     }
 
     }

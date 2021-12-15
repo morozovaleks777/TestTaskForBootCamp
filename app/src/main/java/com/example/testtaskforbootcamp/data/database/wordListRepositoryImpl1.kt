@@ -12,21 +12,20 @@ class WordListRepositoryImpl1(application: Application) : WordListRepository {
     private val wordListDao = AppDatabase.getInstance(application).wordListDao()
     private val mapper = WordListMapper()
 
-
     override suspend fun getWordItem(word: String): WordItem {
         val dbModel = wordListDao.getWordItem(word)
         return mapper.mapDBItemTOWordItem(dbModel)
     }
 
     override fun getWordList(): LiveData<List<WordItem>> =
-        Transformations.map(wordListDao.getWordList()   ) {
-                mapper.mapListDBModelToListEntity(it)
-            }
-
-
+        Transformations.map(wordListDao.getWordList()) {
+            mapper.mapListDBModelToListEntity(it)
+        }
 
     override suspend fun addWordItem(wordItem: WordItem) {
+        wordItem.itemId = WordItem.idCounter++
         wordListDao.addWordItem(mapper.mapWordItem1ToDbItem(wordItem))
+
     }
 
 

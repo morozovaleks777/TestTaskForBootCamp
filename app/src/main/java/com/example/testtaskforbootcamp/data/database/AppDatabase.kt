@@ -28,6 +28,7 @@ abstract class AppDatabase : RoomDatabase() {
                 AppDatabase::class.java,
                 DB_NAME
             )
+
                 .build()
             INSTANCE = db
             return db

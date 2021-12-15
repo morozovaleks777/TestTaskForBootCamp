@@ -2,8 +2,10 @@ package com.example.testtaskforbootcamp.presentation
 
 
 import android.app.Application
-import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.testtaskforbootcamp.data.WordListMapper
 import com.example.testtaskforbootcamp.data.database.WordListRepositoryImpl1
 import com.example.testtaskforbootcamp.data.network.Retrofit
@@ -17,86 +19,91 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.util.*
 
-class MainViewModel  (application: Application):AndroidViewModel(application) {
+class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val wordRepository = Retrofit()
-    private val repository= WordListRepositoryImpl1(application)
-    private val  addWordItemUseCase=AddWordItemUseCase(repository)
-    private val  getWordItemUseCase=GetWordItemUseCase(repository)
-    private val  getWordListCase= GetWordListUseCase(repository)
-    private val  mapper=WordListMapper()
-    private var wordItemId: Int = WordItem.UNDEFINED_ID
-
-    val wordLiveData=MutableLiveData<WordResponse.WordResponseItem>()
-    val wordDBLiveData=MutableLiveData<WordItem>()
+    private val repository = WordListRepositoryImpl1(application)
+    private val addWordItemUseCase = AddWordItemUseCase(repository)
+    private val getWordItemUseCase = GetWordItemUseCase(repository)
+    private val getWordListCase = GetWordListUseCase(repository)
+    private val mapper = WordListMapper()
 
 
-    var list=  mutableSetOf<String>()
-    val l= getWordListCase.getWordList()
+    val wordLiveData = MutableLiveData<WordResponse.WordResponseItem>()
+    val wordDBLiveData = MutableLiveData<WordItem>()
+    val wordList = getWordListCase.getWordList()
 
-    private val _errorInputName=MutableLiveData<Boolean>()
+    var list = mutableSetOf<String>()
+
+
+    private val _errorInputName = MutableLiveData<Boolean>()
     val errorInputName: LiveData<Boolean>
         get() = _errorInputName
 
-    private val _closeScreen=MutableLiveData<Unit>()
+    private val _closeScreen = MutableLiveData<Unit>()
     val closeScreen: LiveData<Unit>
         get() = _closeScreen
 
 
-        init {
+    init {
         fetchWord("hello")
 
-            Log.d("addWordItem", fetchWord("hello").toString())
     }
 
-   fun fetchWord(word:String) {
-       val parseWord=parseInputName(word)
-       val wordValid=validateInput(parseWord)
-if(wordValid) {
+    fun fetchWord(word: String) {
+        val parseWord = parseInputName(word)
+        val wordValid = validateInput(parseWord)
+        if (wordValid) {
 
-    viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch(Dispatchers.IO) {
 
-        if (list.isEmpty() || !list.contains(word.lowercase(Locale.getDefault()))) {
-            val wordResponse = wordRepository.getWord(word)
+                if (list.isEmpty() || !list.contains(word.lowercase(Locale.getDefault()))) {
+                    val wordResponse = wordRepository.getWord(word)
+                    val wordItem = mapper.mapWordResponseToWordItem1(wordResponse)
 
-            try {
+                    try {
+                        val list1 = mutableListOf<WordItem>()
+                        list1.add(mapper.mapWordResponseToWordItem1(wordResponse))
+                        wordLiveData.postValue(wordResponse)
 
-                wordLiveData.postValue(wordResponse)
+                        addWordItemUseCase.addWordItem(wordItem)
 
-                    addWordItemUseCase.addWordItem(mapper.mapWordResponseToWordItem1(wordResponse))
+                        list.add(
+                            mapper.mapWordResponseToWordItem1(wordResponse).word.lowercase(
+                                Locale.getDefault()
+                            )
+                        )
 
-                list.add(mapper.mapWordResponseToWordItem1(wordResponse).word.lowercase(Locale.getDefault()))
+                    } catch (exception: Exception) {
+                        if (exception is HttpException) {
+                            exception.message()
+                        }
+                    }
 
-                Log.d("addWordItem ", " list ${list}")
-                Log.d("addWordItem ", "db ${getWordItemUseCase.getWordItem(word).phonetic}")
-            } catch (exception: Exception) {
-                if (exception is HttpException) {
+                } else if (list.contains(word.lowercase(Locale.getDefault()))) {
+                    val dbWord = getWordItemUseCase.getWordItem(word.lowercase(Locale.getDefault()))
+
+                    wordDBLiveData.postValue(dbWord)
 
                 }
             }
-
-       // }else if(list.contains(word.lowercase(Locale.getDefault()))) {
-        }else if(list.contains(word.lowercase(Locale.getDefault()))) {
-            val dbWord = getWordItemUseCase.getWordItem(word.lowercase(Locale.getDefault()))
-            wordDBLiveData.postValue(dbWord)
-            Log.d("addWordItem ","kuuuu ${dbWord.phonetic}")
         }
     }
-}
-    }
 
-    private fun validateInput(inputName:String):Boolean{
-        var result=true
-        if(inputName.isBlank()) {
-            _errorInputName.value=true
+    private fun validateInput(inputName: String): Boolean {
+        var result = true
+        if (inputName.isBlank()) {
+            _errorInputName.value = true
             result = false
         }
 
         return result
     }
-    fun resetErrorInputName(){
-        _errorInputName.value=false
+
+    fun resetErrorInputName() {
+        _errorInputName.value = false
     }
-    private fun parseInputName(inputName: String?):String{
+
+    private fun parseInputName(inputName: String?): String {
         return inputName?.trim() ?: ""
     }
 }

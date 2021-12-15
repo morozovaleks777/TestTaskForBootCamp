@@ -16,8 +16,7 @@ interface WordResponseListDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addWordItem(wordDBModel: DBItem)
 
-
-
     @Query("SELECT * FROM wordItem WHERE word LIKE :word LIMIT 1")
-    suspend fun getWordItem(word:String):DBItem
+    suspend fun getWordItem(word: String): DBItem
+
 }

@@ -5,11 +5,12 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 
 class Retrofit {
 
-    val wordApi = Retrofit.Builder()
+    private val wordApi: WordApi = Retrofit.Builder()
         .addConverterFactory(MoshiConverterFactory.create())
         .baseUrl("https://api.dictionaryapi.dev/api/v2/entries/en/")
         .build()
         .create(WordApi::class.java)
-    suspend fun getWord(word:String) = wordApi
-        .getWord(word)[0]
+
+    suspend fun getWord(word: String) = wordApi.getWord(word)[0]
+
 }

@@ -5,6 +5,6 @@ import retrofit2.http.Path
 
 interface WordApi {
 
-        @GET("{word}")
-        suspend fun getWord(@Path("word") word:String):List<WordResponse.WordResponseItem>
-    }
+    @GET("{word}")
+    suspend fun getWord(@Path("word") word: String): List<WordResponse.WordResponseItem>
+}
