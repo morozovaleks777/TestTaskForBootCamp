@@ -52,10 +52,6 @@ class MainFragment : Fragment() {
         observeWordResponse()
         observDB()
 
-        viewModel.wordList.observe(viewLifecycleOwner) {
-            Log.d("addWordItem", " base from fragment ${it.size}")
-
-        }
     }
 
     @SuppressLint("SetTextI18n")
