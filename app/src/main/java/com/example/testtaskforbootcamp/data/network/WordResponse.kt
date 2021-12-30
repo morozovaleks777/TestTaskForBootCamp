@@ -4,10 +4,11 @@ package com.example.testtaskforbootcamp.data.network
 import com.example.testtaskforbootcamp.domain.WordItem
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import javax.inject.Inject
 
 class WordResponse : ArrayList<WordResponse.WordResponseItem>() {
     @JsonClass(generateAdapter = true)
-    data class WordResponseItem(
+    data class WordResponseItem @Inject constructor(
         var itemId: Int = WordItem.UNDEFINED_ID,
         @Json(name = "meanings")
         val meanings: List<Meaning>,

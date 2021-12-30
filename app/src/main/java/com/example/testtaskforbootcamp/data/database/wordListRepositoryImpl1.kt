@@ -6,15 +6,18 @@ import androidx.lifecycle.Transformations
 import com.example.testtaskforbootcamp.data.WordListMapper
 import com.example.testtaskforbootcamp.domain.WordItem
 import com.example.testtaskforbootcamp.domain.WordListRepository
+import javax.inject.Inject
 
-class WordListRepositoryImpl1(application: Application) : WordListRepository {
-
-    private val wordListDao = AppDatabase.getInstance(application).wordListDao()
-    private val mapper = WordListMapper()
+class WordListRepositoryImpl1 @Inject constructor(
+    val application: Application,
+    private val mapper: WordListMapper,
+    private val wordListDao: WordResponseListDao
+) : WordListRepository {
 
     override suspend fun getWordItem(word: String): WordItem {
         val dbModel = wordListDao.getWordItem(word)
         return mapper.mapDBItemTOWordItem(dbModel)
+
     }
 
     override fun getWordList(): LiveData<List<WordItem>> =

@@ -1,6 +1,7 @@
 package com.example.testtaskforbootcamp.presentation
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.SpannableString
@@ -19,15 +20,24 @@ import androidx.lifecycle.ViewModelProvider
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.testtaskforbootcamp.R
 import com.example.testtaskforbootcamp.databinding.MainFragmentBinding
+import com.example.testtaskforbootcamp.di.AppModule
+import com.example.testtaskforbootcamp.di.ApplicationComponent
+import com.example.testtaskforbootcamp.di.DaggerApplicationComponent
 import com.example.testtaskforbootcamp.domain.WordItem
+import javax.inject.Inject
 
-class MainFragment : Fragment() {
+class MainFragment  : Fragment() {
 
     private val viewBinding: MainFragmentBinding by viewBinding()
 
+    @Inject lateinit var  viewModelFactory:ViewModelFactory
     val viewModel by lazy {
-        ViewModelProvider(this).get(MainViewModel::class.java)
+    ViewModelProvider(this,viewModelFactory)[MainViewModel::class.java]
     }
+
+private val component: ApplicationComponent by lazy {
+    DaggerApplicationComponent.builder().appModule(AppModule(requireActivity().application)).build()
+}
     private lateinit var word: TextView
     private lateinit var phonetics: TextView
     private lateinit var meanings: TextView
@@ -35,6 +45,11 @@ class MainFragment : Fragment() {
     private lateinit var generateButton: Button
     private lateinit var wordEnter: String
     private lateinit var itemList: List<WordItem>
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        component.inject(this )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,7 +65,7 @@ class MainFragment : Fragment() {
         observeViewModel()
         setButtonListener()
         observeWordResponse()
-        observDB()
+        observeDB()
 
         viewModel.wordList.observe(viewLifecycleOwner) {
             Log.d("addWordItem", " base from fragment ${it.size}")
@@ -59,7 +74,7 @@ class MainFragment : Fragment() {
     }
 
     @SuppressLint("SetTextI18n")
-    private fun observDB() {
+    private fun observeDB() {
 
         viewModel.wordDBLiveData.observe(viewLifecycleOwner, {
             word.text = "from database: \n word :  \n ${it.word}"
@@ -72,47 +87,50 @@ class MainFragment : Fragment() {
     private fun observeWordResponse() {
 
         viewModel.wordLiveData.observe(viewLifecycleOwner) { response ->
-            apply {
-                val wordMeanings = SpannableString(
-                    "definition :  \n ${response.meanings.indices.map { response.meanings }} \n" +
-                            "example : \n ${response.meanings[0].definitions[0].example} \n" +
-                            "synonyms : \n ${response.meanings[0].definitions[0].synonyms}"
-                )
-                wordMeanings.setSpan(
-                    ForegroundColorSpan(
-                        resources.getColor(
-                            R.color.purple_200,
-                            resources.newTheme()
-                        )
-                    ),
-                    0,
-                    10,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
 
-                val wordText = SpannableString("word :  \n ${response.word}")
-                wordText.setSpan(
-                    ForegroundColorSpan(
-                        resources.getColor(
-                            R.color.purple_200,
-                            resources.newTheme()
-                        )
-                    ), 0, 5, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
+                apply {
+                    val wordMeanings = SpannableString(
+                        "definition :  \n ${response.meanings.indices.map { response.meanings }} \n" +
+                                "example : \n ${response.meanings[0].definitions[0].example} \n" +
+                                "synonyms : \n ${response.meanings[0].definitions[0].synonyms}"
+                    )
+                    wordMeanings.setSpan(
+                        ForegroundColorSpan(
+                            resources.getColor(
+                                R.color.purple_200,
+                                resources.newTheme()
+                            )
+                        ),
+                        0,
+                        10,
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
 
-                val wordPhonetic = SpannableString("phonetics :  \n ${response.phonetics[0].text}")
-                wordPhonetic.setSpan(
-                    ForegroundColorSpan(
-                        resources.getColor(
-                            R.color.purple_200,
-                            resources.newTheme()
-                        )
-                    ), 0, 9, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
+                    val wordText = SpannableString("word :  \n ${response.word}")
+                    wordText.setSpan(
+                        ForegroundColorSpan(
+                            resources.getColor(
+                                R.color.purple_200,
+                                resources.newTheme()
+                            )
+                        ), 0, 5, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
 
-                word.text = wordText
-                phonetics.text = wordPhonetic
-                meanings.text = wordMeanings
+                    val wordPhonetic =
+                        SpannableString("phonetics :  \n ${response.phonetics[0].text}")
+                    wordPhonetic.setSpan(
+                        ForegroundColorSpan(
+                            resources.getColor(
+                                R.color.purple_200,
+                                resources.newTheme()
+                            )
+                        ), 0, 9, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+
+                    word.text = wordText
+                    phonetics.text = wordPhonetic
+                    meanings.text = wordMeanings
+
 
 
             }
@@ -173,5 +191,6 @@ class MainFragment : Fragment() {
         fun newInstance() = MainFragment()
 
     }
+
 
 }

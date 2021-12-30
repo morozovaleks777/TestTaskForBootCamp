@@ -7,7 +7,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.testtaskforbootcamp.data.WordListMapper
-import com.example.testtaskforbootcamp.data.database.WordListRepositoryImpl1
 import com.example.testtaskforbootcamp.data.network.Retrofit
 import com.example.testtaskforbootcamp.data.network.WordResponse
 import com.example.testtaskforbootcamp.domain.AddWordItemUseCase
@@ -18,20 +17,22 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.util.*
+import javax.inject.Inject
 
-class MainViewModel(application: Application) : AndroidViewModel(application) {
-    private val wordRepository = Retrofit()
-    private val repository = WordListRepositoryImpl1(application)
-    private val addWordItemUseCase = AddWordItemUseCase(repository)
-    private val getWordItemUseCase = GetWordItemUseCase(repository)
-    private val getWordListCase = GetWordListUseCase(repository)
-    private val mapper = WordListMapper()
+
+class MainViewModel @Inject constructor(
+    application: Application,
+    private val mapper: WordListMapper,
+    private val wordRepository: Retrofit,
+    private val addWordItemUseCase: AddWordItemUseCase,
+    private val getWordItemUseCase: GetWordItemUseCase,
+    getWordListCase: GetWordListUseCase,
+) : AndroidViewModel(application) {
 
 
     val wordLiveData = MutableLiveData<WordResponse.WordResponseItem>()
     val wordDBLiveData = MutableLiveData<WordItem>()
     val wordList = getWordListCase.getWordList()
-
     var list = mutableSetOf<String>()
 
 
@@ -57,7 +58,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             viewModelScope.launch(Dispatchers.IO) {
 
                 if (list.isEmpty() || !list.contains(word.lowercase(Locale.getDefault()))) {
-                    val wordResponse = wordRepository.getWord(word)
+                    val wordResponse= wordRepository.getWord(word)
+
                     val wordItem = mapper.mapWordResponseToWordItem1(wordResponse)
 
                     try {
@@ -106,4 +108,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun parseInputName(inputName: String?): String {
         return inputName?.trim() ?: ""
     }
+
+
 }

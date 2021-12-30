@@ -1,7 +1,10 @@
 package com.example.testtaskforbootcamp.domain
 
+import javax.inject.Inject
 
-class AddWordItemUseCase(private val wordListRepository: WordListRepository) {
+
+class AddWordItemUseCase @Inject constructor
+    (private val wordListRepository: WordListRepository) {
 
     suspend fun addWordItem(wordItem: WordItem) {
         wordListRepository.addWordItem(wordItem)
