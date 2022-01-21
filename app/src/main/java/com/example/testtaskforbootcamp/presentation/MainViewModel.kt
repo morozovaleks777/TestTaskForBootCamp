@@ -2,12 +2,15 @@ package com.example.testtaskforbootcamp.presentation
 
 
 import android.app.Application
+
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.testtaskforbootcamp.data.WordListMapper
 import com.example.testtaskforbootcamp.data.network.Retrofit
+
+
 import com.example.testtaskforbootcamp.data.network.WordResponse
 import com.example.testtaskforbootcamp.domain.AddWordItemUseCase
 import com.example.testtaskforbootcamp.domain.GetWordItemUseCase
@@ -21,7 +24,7 @@ import javax.inject.Inject
 
 
 class MainViewModel @Inject constructor(
-    application: Application,
+   application: Application,
     private val mapper: WordListMapper,
     private val wordRepository: Retrofit,
     private val addWordItemUseCase: AddWordItemUseCase,
@@ -29,6 +32,8 @@ class MainViewModel @Inject constructor(
     getWordListCase: GetWordListUseCase,
 ) : AndroidViewModel(application) {
 
+val isConect=MutableLiveData<Boolean>()
+val isWrongWord=MutableLiveData<Boolean>()
 
     val wordLiveData = MutableLiveData<WordResponse.WordResponseItem>()
     val wordDBLiveData = MutableLiveData<WordItem>()
@@ -51,6 +56,8 @@ class MainViewModel @Inject constructor(
     }
 
     fun fetchWord(word: String) {
+        isConect.postValue(Retrofit.isNoConnection)
+        isWrongWord.postValue(Retrofit.isWrongWord)
         val parseWord = parseInputName(word)
         val wordValid = validateInput(parseWord)
         if (wordValid) {
@@ -58,9 +65,10 @@ class MainViewModel @Inject constructor(
             viewModelScope.launch(Dispatchers.IO) {
 
                 if (list.isEmpty() || !list.contains(word.lowercase(Locale.getDefault()))) {
-                    val wordResponse= wordRepository.getWord(word)
+               val  wordResponse= wordRepository.getWord(word )
 
-                    val wordItem = mapper.mapWordResponseToWordItem1(wordResponse)
+if(wordResponse is WordResponse.WordResponseItem){
+                    val wordItem = mapper.mapWordResponseToWordItem1(wordResponse )
 
                     try {
                         val list1 = mutableListOf<WordItem>()
@@ -79,17 +87,18 @@ class MainViewModel @Inject constructor(
                         if (exception is HttpException) {
                             exception.message()
                         }
-                    }
+                    }}}
 
-                } else if (list.contains(word.lowercase(Locale.getDefault()))) {
-                    val dbWord = getWordItemUseCase.getWordItem(word.lowercase(Locale.getDefault()))
+                else if (list.contains(word.lowercase(Locale.getDefault()))) {
+        val dbWord = getWordItemUseCase.getWordItem(word.lowercase(Locale.getDefault()))
 
-                    wordDBLiveData.postValue(dbWord)
+        wordDBLiveData.postValue(dbWord)
+    }
 
                 }
             }
         }
-    }
+
 
     private fun validateInput(inputName: String): Boolean {
         var result = true

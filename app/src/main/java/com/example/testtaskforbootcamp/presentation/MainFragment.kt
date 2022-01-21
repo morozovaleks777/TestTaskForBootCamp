@@ -15,14 +15,14 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.testtaskforbootcamp.R
+import com.example.testtaskforbootcamp.data.network.Retrofit
 import com.example.testtaskforbootcamp.databinding.MainFragmentBinding
-import com.example.testtaskforbootcamp.di.AppModule
-import com.example.testtaskforbootcamp.di.ApplicationComponent
-import com.example.testtaskforbootcamp.di.DaggerApplicationComponent
+import com.example.testtaskforbootcamp.di.*
 import com.example.testtaskforbootcamp.domain.WordItem
 import javax.inject.Inject
 
@@ -49,6 +49,7 @@ private val component: ApplicationComponent by lazy {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         component.inject(this )
+
     }
 
     override fun onCreateView(
@@ -66,7 +67,7 @@ private val component: ApplicationComponent by lazy {
         setButtonListener()
         observeWordResponse()
         observeDB()
-
+showToast()
         viewModel.wordList.observe(viewLifecycleOwner) {
             Log.d("addWordItem", " base from fragment ${it.size}")
 
@@ -184,6 +185,29 @@ private val component: ApplicationComponent by lazy {
 
             override fun afterTextChanged(s: Editable?) {
             }
+        })
+    }
+
+    private fun showToast(){
+        viewModel.isConect.observe(viewLifecycleOwner,{
+            if(it){
+            Toast.makeText(
+               requireContext(),
+                "oh,no no no internet",
+                Toast.LENGTH_SHORT
+            ).show()
+                Retrofit.isNoConnection=false}
+
+        })
+        viewModel.isWrongWord.observe(viewLifecycleOwner,{
+            if(it){
+            Toast.makeText(
+                requireContext(),
+                "oh,no no no its wrong word",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            Retrofit.isWrongWord=false}
         })
     }
 

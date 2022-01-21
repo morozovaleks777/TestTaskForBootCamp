@@ -20,7 +20,7 @@ class WordListRepositoryImpl1 @Inject constructor(
 
     }
 
-    override fun getWordList(): LiveData<List<WordItem>> =
+    override  fun getWordList(): LiveData<List<WordItem>> =
         Transformations.map(wordListDao.getWordList()) {
             mapper.mapListDBModelToListEntity(it)
         }
